@@ -1,4 +1,4 @@
-# aoto_douban
+# auto_douban
 豆瓣小组自动回帖、顶贴
 
 支持cookie登录和账号密码登陆（位置代码中自己找，print("* 模拟登陆... *")上面）；  
