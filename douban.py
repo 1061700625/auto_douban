@@ -11,9 +11,6 @@ import urllib.request, urllib.parse, urllib3, base64
 import requests.adapters
 from goto import with_goto
 
-ID = '144690668'
-sess = requests.session()
-
 
 def main():
     global sess
@@ -65,8 +62,8 @@ def main():
                 except:
                     print("* 无需验证码登录 *")
                 data = {
-                    'name': '15797698335',
-                    'password': '',
+                    'name': USERNAME,
+                    'password': PASSWORD,
                     'remember': 'on',
                     'ticket': '',
                     'ck': '',
@@ -81,11 +78,18 @@ def main():
                     time.sleep(60 * 60)
                     continue
                 print(html_login.json())
-                if("时光" in html_login.text):
+                if html_login.json()['status'] == 'failed':
+                    print('\r\n')
+                    print(html_login.json()['description'])
+                    return 0
+                if(NAME in html_login.text):
                     break
                 else:
                     if(html_login.json()['description'] == '需要图形验证码'):
-                        print(">> 糟糕，需要滑块验证")
+                        print(">> 糟糕，需要滑块验证。")
+                        print("如果是今天第一次运行，请手动打开网页登陆一下，再运行程序")
+                        print("不然就过一会儿再试试")
+                        print("滑块验证下次再加了")
                         break
                     else:
                         print("* 验证码识别错误,状态重置 *")
@@ -97,10 +101,13 @@ def main():
                 print("* Cookie登陆... *")
                 url_cookie = "https://www.douban.com/group/topic/%s/?start=0" % ID
                 header = {
-                    'Cookie': r'',
+                    'Cookie': COOKIE,
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
                 }
-                html_cookie = sess.get(url_cookie, headers=header)
+                try:
+                    html_cookie = sess.get(url_cookie, headers=header)
+                except InvalidHeader:
+                    print("Cookie无效")
                 headers = header
                 if ("登录" not in html_cookie.text):
                     cookie_login_flag = True
@@ -111,7 +118,7 @@ def main():
                     print("* 获取ck成功: ", ck, "*")
                 else:
                     print("* Cookie登录也失败!!! *")
-                    os._exit(0)
+                    return 0
             else:
                 print("* 模拟登录成功 *")
 
@@ -135,13 +142,16 @@ def main():
                 for i in range(url_len):
                     url_group = urls[i] + r'/add_comment'
                     pars = [
-                            "白日依山尽，黄河入海流。欲穷千里目，更上一层楼。 ",
-                            "寥落古行宫，宫花寂寞红。白头宫女在，闲坐说玄宗。 ",
-                            "三日入厨下，洗手作羹汤。未谙姑食性，先遣小姑尝。 ",
-                            "君自故乡来，应知故乡事。来日绮窗前，寒梅著花未？ ",
-                            "独坐幽篁里，弹琴复长啸。深林人不知，明月来相照。 ",
-                            "床前明月光，疑是地上霜。举头望明月，低头思故乡。 ",
-                            "移舟泊烟渚，日暮客愁新。野旷天低树，江清月近人。 "
+                            "up"
+                            "upup ",
+                            "顶帖 ",
+                            # "白日依山尽，黄河入海流。欲穷千里目，更上一层楼。 ",
+                            # "寥落古行宫，宫花寂寞红。白头宫女在，闲坐说玄宗。 ",
+                            # "三日入厨下，洗手作羹汤。未谙姑食性，先遣小姑尝。 ",
+                            # "君自故乡来，应知故乡事。来日绮窗前，寒梅著花未？ ",
+                            # "独坐幽篁里，弹琴复长啸。深林人不知，明月来相照。 ",
+                            # "床前明月光，疑是地上霜。举头望明月，低头思故乡。 ",
+                            # "移舟泊烟渚，日暮客愁新。野旷天低树，江清月近人。 "
                     ]
                     one_par = pars[random.randint(0, len(pars)-1)]
                     Reload += 1
@@ -160,7 +170,7 @@ def main():
                             print("* 获取验证码... *")
                             url_img = sess.get(url_2, headers=headers)
                             if (url_img.status_code == 403):
-                                print("!!!")
+                                print("403!!!")
                                 break
                             soup = BeautifulSoup(url_img.text, 'lxml')
                             img = soup.find("img", id="captcha_image")["src"]
@@ -254,8 +264,9 @@ def vcode_proc():
             if count > 2:
                 pixdata[x,y] = 255
     img.save('img2.jpg')
+    
 def vcode2str():
-    access_token = '24.3c7c50521d8d1a29465fdcc1fa111f9a.2592000.1564582251.282335-10750454'
+    access_token = ''
     url = 'https://aip.baidubce.com/rest/2.0/ocr/v1/webimage?access_token=' + access_token
     f = open(r'img2.jpg', 'rb')
     img = base64.b64encode(f.read())
@@ -279,11 +290,27 @@ def vcode2str():
                 if(strings["error_code"] == 17):
                     print("* 日调用次数已上限：", strings["error_msg"], "*\r\n")
                     input()
-                    os._exit(0)
+                    return 0
             except:
                 pass
 
 if __name__ == '__main__':
+    # vcode2str()函数下的access_token请自行添加
+    sess = requests.session()
+    ID = input("输入贴子地址猴的数字，如https://www.douban.com/group/topic/12345/中的12345：").strip()
+    NAME = input('输入你的豆瓣昵称，如 时光：').strip()
+    USERNAME = input('输入你的登陆用户名，如15797698335：').strip()
+    PASSWORD = input('输入你的登陆密码，如pwd：').strip()
+    COOKIE = input('可选！输入Cookie，回车跳过：').strip()
+
+    print('\r\n')
+    print('*'*50)
+    print('* ID: ', ID)
+    print('* NAME: ', NAME)
+    print('* USERNAME: ', USERNAME)
+    print('*'*50, '\r\n')
     while 1:
-        main()
+        if main() == 0:
+            break
+    input('任意键退出...')
 
