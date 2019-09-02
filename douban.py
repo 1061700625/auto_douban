@@ -124,9 +124,9 @@ def main():
 
             if(cookie_login_flag == False):
                 print("* 获取ck... *")
-                url_ck = "https://www.douban.com/group/topic/%s/?start=0" % ID
-                html_ck = sess.get(url_ck, headers=headers)
-                soup = BeautifulSoup(html_ck.text, 'lxml')
+                # url_ck = "https://www.douban.com/group/topic/%s/?start=0" % ID
+                # html_ck = sess.get(url_ck, headers=headers)
+                soup = BeautifulSoup(sess.get('https://www.douban.com/').text, 'lxml')
                 ck = soup.find_all('tbody')[0].find_all("a")[-1]['href'][-4:]
                 print("* 成功获取ck: ", ck, "*")
 
@@ -136,7 +136,7 @@ def main():
             if(start_flag == True):
                 urls = [
                         # r'https://www.douban.com/group/topic/144511002',
-                        r'https://www.douban.com/group/topic/%s' % ID,
+                        r'https://www.douban.com/group/topic/%s/' % ID,
                         ]
                 url_len = len(urls)
                 for i in range(url_len):
@@ -264,9 +264,9 @@ def vcode_proc():
             if count > 2:
                 pixdata[x,y] = 255
     img.save('img2.jpg')
-    
+
 def vcode2str():
-    access_token = ''
+    access_token = '24.3c7c50521d8d1a29465fdcc1fa111f9a.2592000.1564582251.282335-10750454'
     url = 'https://aip.baidubce.com/rest/2.0/ocr/v1/webimage?access_token=' + access_token
     f = open(r'img2.jpg', 'rb')
     img = base64.b64encode(f.read())
@@ -295,7 +295,6 @@ def vcode2str():
                 pass
 
 if __name__ == '__main__':
-    # vcode2str()函数下的access_token请自行添加
     sess = requests.session()
     ID = input("输入贴子地址猴的数字，如https://www.douban.com/group/topic/12345/中的12345：").strip()
     NAME = input('输入你的豆瓣昵称，如 时光：').strip()
