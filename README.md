@@ -1,5 +1,7 @@
 # auto_douban
 豆瓣小组自动回帖、顶贴
+**请看这篇文章：http://xfxuezhang.cn/index.php/archives/213/**    
+
 
 支持cookie登录和账号密码登陆（位置代码中自己找，print("* 模拟登陆... *")上面）；  
 还加了换ip代理的，不过好像没什么用。  
